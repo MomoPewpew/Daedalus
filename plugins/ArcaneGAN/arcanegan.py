@@ -5,8 +5,6 @@ from torchvision import transforms
 import torch, PIL
 import os
 
-from tqdm.notebook import tqdm
-
 mtcnn = MTCNN(image_size=256, margin=80)
 
 # simplest ye olde trustworthy MTCNN for face detection with landmarks
@@ -102,7 +100,6 @@ def tensor2im(var):
 
 def proc_pil_img(input_image, model):
     transformed_image = img_transforms(input_image)[None,...].cuda().half()
-            
     with torch.no_grad():
         result_image = model(transformed_image)[0]; print(result_image.shape)
         output_image = tensor2im(result_image)
@@ -114,30 +111,29 @@ def proc_pil_img(input_image, model):
 
 version = '0.4' #@param ['0.1','0.2','0.3','0.4']
 
-model_path = os.path.join(os.path.dirname(__file__) + f'/content/ArcaneGANv{version}.jit')
-in_dir = os.path.join(os.path.dirname(__file__) + '/content/in')
-out_dir = os.path.join(os.path.dirname(__file__) + f"/content/{model_path.split('/')[-1][:-4]}_out")
-
+model_path = os.path.join(os.path.dirname(__file__) + f'\\content\\ArcaneGANv{version}.jit')
+in_dir = os.path.join(os.path.dirname(__file__) + '\\content\\in')
+out_dir = os.path.join(os.path.dirname(__file__) + '\\content\\out')
 model = torch.jit.load(model_path).eval().cuda().half()
 
 #setup colab interface
 
-from google.colab import files
-import ipywidgets as widgets
-from IPython.display import clear_output 
-from IPython.display import display
+#from google.colab import files
+#import ipywidgets as widgets
+#from IPython.display import clear_output 
+#from IPython.display import display
 import os
 from glob import glob
 
-def reset(p):
-  with output_reset:
-    clear_output()
-  clear_output()
-  process()
+#def reset(p):
+#  with output_reset:
+#    clear_output()
+#  clear_output()
+#  process()
  
-button_reset = widgets.Button(description="Upload")
-output_reset = widgets.Output()
-button_reset.on_click(reset)
+#button_reset = widgets.Button(description="Upload")
+#output_reset = widgets.Output()
+#button_reset.on_click(reset)
 
 def fit(img,maxsize=512):
   maxdim = max(*img.size)
@@ -148,35 +144,41 @@ def fit(img,maxsize=512):
     img = img.resize(size)
   return img
  
-def show_img(f, size=1024):
-  display(fit(PIL.Image.open(f),size))
+#def show_img(f, size=1024):
+#  display(fit(PIL.Image.open(f),size))
 
 def process(upload=True):
   os.makedirs(in_dir, exist_ok=True)
-  os.system("%cd {in_dir}/")
-  os.system("rm -rf {out_dir}/*")
+  os.system("cd {in_dir}/")
+  ##os.system("rm -rf {out_dir}/*")
+  os.system("rd -rf {out_dir}/*")
   os.makedirs(out_dir, exist_ok=True)
   in_files = sorted(glob(f'{in_dir}/*'))
-  if (len(in_files)==0) | (upload):
-    os.system("rm -rf {in_dir}/*")
-    uploaded = files.upload()
-    if len(uploaded.keys())<=0: 
-      print('\nNo files were uploaded. Try again..\n')
-      return
+#  if (len(in_files)==0) | (upload):
+#    os.system("rm -rf {in_dir}/*")
+#    uploaded = files.upload()
+#    if len(uploaded.keys())<=0: 
+#      print('\nNo files were uploaded. Try again..\n')
+#      return
 
-  print('\nPress the button and pick some photos to upload\n')
+#  print('\nPress the button and pick some photos to upload\n')
   
   in_files = sorted(glob(f'{in_dir}/*'))
-  for img in tqdm(in_files):
-    out = f"{out_dir}/{img.split('/')[-1].split('.')[0]}.jpg"
+  for img in in_files:
+    backslash_char = "\\"
+    out = f"{out_dir}/{img.split(backslash_char)[-1].split('.')[0]}.jpg"
     im = PIL.Image.open(img).convert("RGB") 
     im = scale_by_face_size(im, target_face=300, max_res=1_500_000, max_upscale=2)
     res = proc_pil_img(im, model)
     res.save(out)
 
   out_zip = f"{out_dir}.zip"
-  os.system("zip {out_zip} {out_dir}/*")
+  ##os.system("zip {out_zip} {out_dir}/*")
+  ##zipstring = ( f"\"\"E:\\Program Files (x86)\\WinRAR\\winrar.exe\" a -tzip \"{out_dir}\" \"{out_zip}\"\"")
+  zipstring = ( f"7z a \"{out_zip}\" \"{out_dir}\\\*\"\"")
+  print(zipstring)
+  os.system(zipstring)
     
   processed = sorted(glob(f'{out_dir}/*'))[:3]
-  for f in processed: 
-    show_img(f, 256)
+#  for f in processed: 
+#    show_img(f, 256)
