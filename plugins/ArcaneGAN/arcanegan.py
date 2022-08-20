@@ -3,6 +3,7 @@
 from facenet_pytorch import MTCNN
 from torchvision import transforms
 import torch, PIL
+import os
 
 from tqdm.notebook import tqdm
 
@@ -113,9 +114,9 @@ def proc_pil_img(input_image, model):
 
 version = '0.4' #@param ['0.1','0.2','0.3','0.4']
 
-model_path = f'/content/ArcaneGANv{version}.jit' 
-in_dir = '/content/in'
-out_dir = f"/content/{model_path.split('/')[-1][:-4]}_out"
+model_path = os.path.join(os.path.dirname(__file__) + f'/content/ArcaneGANv{version}.jit')
+in_dir = os.path.join(os.path.dirname(__file__) + '/content/in')
+out_dir = os.path.join(os.path.dirname(__file__) + f"/content/{model_path.split('/')[-1][:-4]}_out")
 
 model = torch.jit.load(model_path).eval().cuda().half()
 
@@ -152,12 +153,12 @@ def show_img(f, size=1024):
 
 def process(upload=True):
   os.makedirs(in_dir, exist_ok=True)
-  %cd {in_dir}/
-  !rm -rf {out_dir}/*
+  os.system("%cd {in_dir}/")
+  os.system("rm -rf {out_dir}/*")
   os.makedirs(out_dir, exist_ok=True)
   in_files = sorted(glob(f'{in_dir}/*'))
   if (len(in_files)==0) | (upload):
-    !rm -rf {in_dir}/*
+    os.system("rm -rf {in_dir}/*")
     uploaded = files.upload()
     if len(uploaded.keys())<=0: 
       print('\nNo files were uploaded. Try again..\n')
@@ -174,7 +175,7 @@ def process(upload=True):
     res.save(out)
 
   out_zip = f"{out_dir}.zip"
-  !zip {out_zip} {out_dir}/*
+  os.system("zip {out_zip} {out_dir}/*")
     
   processed = sorted(glob(f'{out_dir}/*'))[:3]
   for f in processed: 
