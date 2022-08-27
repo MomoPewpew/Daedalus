@@ -111,9 +111,9 @@ def proc_pil_img(input_image, model):
 
 version = '0.4' #@param ['0.1','0.2','0.3','0.4']
 
-model_path = os.path.join(os.path.dirname(__file__) + f'\\content\\ArcaneGANv{version}.jit')
-in_dir = os.path.join(os.path.dirname(__file__) + '\\content\\in')
-out_dir = os.path.join(os.path.dirname(__file__) + '\\content\\out')
+model_path = os.path.join(os.path.dirname(__file__) + f'/content/ArcaneGANv{version}.jit')
+in_dir = os.path.join(os.path.dirname(__file__) + '/content/in')
+out_dir = os.path.join('Daedalus/out')
 model = torch.jit.load(model_path).eval().cuda().half()
 
 #setup colab interface
@@ -149,9 +149,8 @@ def fit(img,maxsize=512):
 
 def process(upload=True):
   os.makedirs(in_dir, exist_ok=True)
-  os.system("cd {in_dir}/")
-  ##os.system("rm -rf {out_dir}/*")
-  os.system("rd -rf {out_dir}/*")
+  os.system(f"cd {in_dir}/")
+  os.system(f"rm -rf {out_dir}/*")
   os.makedirs(out_dir, exist_ok=True)
   in_files = sorted(glob(f'{in_dir}/*'))
 #  if (len(in_files)==0) | (upload):
@@ -165,19 +164,15 @@ def process(upload=True):
   
   in_files = sorted(glob(f'{in_dir}/*'))
   for img in in_files:
-    backslash_char = "\\"
+    backslash_char = "/"
     out = f"{out_dir}/{img.split(backslash_char)[-1].split('.')[0]}.jpg"
     im = PIL.Image.open(img).convert("RGB") 
     im = scale_by_face_size(im, target_face=300, max_res=1_500_000, max_upscale=2)
     res = proc_pil_img(im, model)
     res.save(out)
 
-  out_zip = f"{out_dir}.zip"
-  ##os.system("zip {out_zip} {out_dir}/*")
-  ##zipstring = ( f"\"\"E:\\Program Files (x86)\\WinRAR\\winrar.exe\" a -tzip \"{out_dir}\" \"{out_zip}\"\"")
-  zipstring = ( f"7z a \"{out_zip}\" \"{out_dir}\\\*\"\"")
-  print(zipstring)
-  os.system(zipstring)
+  #out_zip = f"{out_dir}.zip"
+  #os.system(f"zip {out_zip} {out_dir}/*")
     
   processed = sorted(glob(f'{out_dir}/*'))[:3]
 #  for f in processed: 
