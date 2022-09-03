@@ -46,7 +46,7 @@ def main() -> None:
     eval(opt.function + '(opt.args)')
 
 def arcanegan(args: str) -> None:
-    cmd = 'conda run -n arcanegan python3 Daedalus/plugins/ArcaneGAN/arcanegan.py'
+    cmd = 'conda run -n arcanegan python3 /home/ubuntu/Daedalus/plugins/ArcaneGAN/arcanegan.py'
     handlecmd(cmd)
 
 def handlecmd(cmd: str) -> None:

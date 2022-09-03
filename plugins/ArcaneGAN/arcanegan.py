@@ -112,8 +112,8 @@ def proc_pil_img(input_image, model):
 version = '0.4' #@param ['0.1','0.2','0.3','0.4']
 
 model_path = os.path.join(os.path.dirname(__file__) + f'/content/ArcaneGANv{version}.jit')
-in_dir = os.path.join('Daedalus/in')
-out_dir = os.path.join('Daedalus/out')
+in_dir = os.path.join('/home/ubuntu/Daedalus/in')
+out_dir = os.path.join('/home/ubuntu/Daedalus/out')
 model = torch.jit.load(model_path).eval().cuda().half()
 
 #setup colab interface
