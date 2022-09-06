@@ -1,18 +1,9 @@
 import argparse
-import asyncio
 import os
-
-taskID = -1
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--taskID",
-        type=int,
-        default="-1",
-        help="The ID of the task that is being worked on."
-    )
+    
     parser.add_argument(
         "--function",
         type=str,
@@ -37,19 +28,20 @@ def main() -> None:
     if opt.function == "":
         return
 
-    if opt.sourceURL != "":
-        pass
-        ##TODO: Download source url
+    os.system("rm /home/ubuntu/Daedalus/in/*")
+    os.system("rm /home/ubuntu/Daedalus/out/*")
 
-    taskID = opt.taskID
+    eval(opt.function + '(opt)')
 
-    eval(opt.function + '(opt.args)')
+    ##TODO: Start shutdown countdown?
 
-def arcanegan(args: str) -> None:
+def arcanegan(opt: argparse.Namespace) -> None:
+    if opt.sourceURL == "":
+        return
+    
+    os.system(f"wget -P /home/ubuntu/Daedalus/in {opt.sourceURL}")
+
     cmd = 'conda run -n arcanegan python3 /home/ubuntu/Daedalus/plugins/ArcaneGAN/arcanegan.py'
-    handlecmd(cmd)
-
-def handlecmd(cmd: str) -> None:
     os.system(cmd)
 
 if __name__ == "__main__":
