@@ -153,3 +153,4 @@ cython_debug/
 daedalus.ppk
 daedalus1policy.json
 daedaluspem.pem
+authorized_keys
