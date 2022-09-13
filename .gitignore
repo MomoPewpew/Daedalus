@@ -154,4 +154,4 @@ daedalus.ppk
 daedalus1policy.json
 daedaluspem.pem
 authorized_keys
-plugins/stable-diffusion/models/ldm/stable-diffusion-v1/model.ckpt
+plugins/stable-diffusion/models/ldm/stable-diffusion-v1/*
