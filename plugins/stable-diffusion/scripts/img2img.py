@@ -107,6 +107,7 @@ def main():
         action='store_true',
         help="use plms sampling",
     )
+
     parser.add_argument(
         "--fixed_code",
         action='store_true',
@@ -140,7 +141,7 @@ def main():
     parser.add_argument(
         "--n_samples",
         type=int,
-        default=2,
+        default=1,
         help="how many samples to produce for each given prompt. A.k.a batch size",
     )
     parser.add_argument(
