@@ -151,7 +151,7 @@ def main():
     parser.add_argument(
         "--n_iter",
         type=int,
-        default=1,
+        default=2,
         help="sample this often",
     )
     parser.add_argument(
@@ -181,7 +181,7 @@ def main():
     parser.add_argument(
         "--n_samples",
         type=int,
-        default=1,
+        default=3,
         help="how many samples to produce for each given prompt. A.k.a. batch size",
     )
     parser.add_argument(
@@ -210,7 +210,7 @@ def main():
     parser.add_argument(
         "--ckpt",
         type=str,
-        default="models/ldm/stable-diffusion-v1/sd-v1-4.ckpt",
+        default="models/ldm/stable-diffusion-v1/model.ckpt",
         help="path to checkpoint of model",
     )
     parser.add_argument(
