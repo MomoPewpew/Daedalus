@@ -126,12 +126,6 @@ def main():
         help="downsampling factor",
     )
     parser.add_argument(
-        "--n_samples",
-        type=int,
-        default=3,
-        help="how many samples to produce for each given prompt. A.k.a. batch size",
-    )
-    parser.add_argument(
         "--scale",
         type=float,
         default=7.5,
@@ -189,17 +183,15 @@ def main():
     wm_encoder = WatermarkEncoder()
     wm_encoder.set_watermark('bytes', wm.encode('utf-8'))
 
-    batch_size = opt.n_samples
-
     prompt = opt.prompt
     assert prompt is not None
-    data = [batch_size * [prompt]]
+    data = [1 * [prompt]]
 
     base_count = len(os.listdir(outdir))
 
     start_code = None
     if opt.fixed_code:
-        start_code = torch.randn([opt.n_samples, 4, opt.H // opt.f, opt.W // opt.f], device=device)
+        start_code = torch.randn([1, 4, opt.H // opt.f, opt.W // opt.f], device=device)
 
     precision_scope = autocast if opt.precision=="autocast" else nullcontext
     with torch.no_grad():
@@ -209,14 +201,14 @@ def main():
                 for prompts in tqdm(data, desc="data"):
                     uc = None
                     if opt.scale != 1.0:
-                        uc = model.get_learned_conditioning(batch_size * [""])
+                        uc = model.get_learned_conditioning(1 * [""])
                     if isinstance(prompts, tuple):
                         prompts = list(prompts)
                     c = model.get_learned_conditioning(prompts)
                     shape = [4, opt.H // opt.f, opt.W // opt.f]
                     samples_ddim, _ = sampler.sample(S=opt.ddim_steps,
                                                         conditioning=c,
-                                                        batch_size=opt.n_samples,
+                                                        batch_size=1,
                                                         shape=shape,
                                                         verbose=False,
                                                         unconditional_guidance_scale=opt.scale,
