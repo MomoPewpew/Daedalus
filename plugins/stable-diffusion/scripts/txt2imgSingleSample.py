@@ -1,18 +1,16 @@
-import argparse, os, sys, glob
+import argparse, os
 import cv2
 import torch
 import numpy as np
 from omegaconf import OmegaConf
 from PIL import Image
-from tqdm import tqdm, trange
+from tqdm import tqdm
 from imwatermark import WatermarkEncoder
 from itertools import islice
 from einops import rearrange
-from torchvision.utils import make_grid
-import time
 from pytorch_lightning import seed_everything
 from torch import autocast
-from contextlib import contextmanager, nullcontext
+from contextlib import nullcontext
 
 from ldm.util import instantiate_from_config
 from ldm.models.diffusion.ddim import DDIMSampler
@@ -198,7 +196,6 @@ def main():
     data = [batch_size * [prompt]]
 
     base_count = len(os.listdir(outdir))
-    grid_count = len(os.listdir(outdir)) - 1
 
     start_code = None
     if opt.fixed_code:
