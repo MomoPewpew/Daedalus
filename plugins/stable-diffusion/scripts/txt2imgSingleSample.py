@@ -134,12 +134,6 @@ def main():
         help="how many samples to produce for each given prompt. A.k.a. batch size",
     )
     parser.add_argument(
-        "--n_rows",
-        type=int,
-        default=0,
-        help="rows in the grid (default: n_samples)",
-    )
-    parser.add_argument(
         "--scale",
         type=float,
         default=7.5,
@@ -198,7 +192,6 @@ def main():
     wm_encoder.set_watermark('bytes', wm.encode('utf-8'))
 
     batch_size = opt.n_samples
-    n_rows = opt.n_rows if opt.n_rows > 0 else batch_size
 
     prompt = opt.prompt
     assert prompt is not None
