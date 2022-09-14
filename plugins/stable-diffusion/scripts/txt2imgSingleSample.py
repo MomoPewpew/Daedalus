@@ -126,11 +126,6 @@ def main():
         help="use plms sampling",
     )
     parser.add_argument(
-        "--laion400m",
-        action='store_true',
-        help="uses the LAION400M model",
-    )
-    parser.add_argument(
         "--fixed_code",
         action='store_true',
         help="if enabled, uses the same starting code across samples ",
@@ -209,11 +204,6 @@ def main():
         default="autocast"
     )
     opt = parser.parse_args()
-
-    if opt.laion400m:
-        print("Falling back to LAION 400M model...")
-        opt.config = "configs/latent-diffusion/txt2img-1p4B-eval.yaml"
-        opt.ckpt = "models/ldm/text2img-large/model.ckpt"
 
     seed_everything(opt.seed)
 
