@@ -226,7 +226,6 @@ def main():
     with torch.no_grad():
         with precision_scope("cuda"):
             with model.ema_scope():
-                tic = time.time()
                 all_samples = list()
                 for n in trange(opt.n_iter, desc="Sampling"):
                     for prompts in tqdm(data, desc="data"):
@@ -277,11 +276,8 @@ def main():
                     img.save(os.path.join(outdir, f'grid-{grid_count:04}.png'))
                     grid_count += 1
 
-                toc = time.time()
-
     print(f"Your samples are ready and waiting for you here: \n{outdir} \n"
           f" \nEnjoy.")
-
 
 if __name__ == "__main__":
     main()
