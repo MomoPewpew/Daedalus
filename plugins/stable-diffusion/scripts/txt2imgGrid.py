@@ -83,11 +83,6 @@ def main():
         help="the prompt to render"
     )
     parser.add_argument(
-        "--skip_grid",
-        action='store_true',
-        help="do not save a grid, only individual samples. Helpful when evaluating lots of samples",
-    )
-    parser.add_argument(
         "--ddim_steps",
         type=int,
         default=50,
@@ -229,21 +224,19 @@ def main():
 
                         x_checked_image_torch = torch.from_numpy(x_samples_ddim).permute(0, 3, 1, 2)
 
-                        if not opt.skip_grid:
-                            all_samples.append(x_checked_image_torch)
+                        all_samples.append(x_checked_image_torch)
 
-                if not opt.skip_grid:
-                    # additionally, save as grid
-                    grid = torch.stack(all_samples, 0)
-                    grid = rearrange(grid, 'n b c h w -> (n b) c h w')
-                    grid = make_grid(grid, nrow=n_rows)
+                # additionally, save as grid
+                grid = torch.stack(all_samples, 0)
+                grid = rearrange(grid, 'n b c h w -> (n b) c h w')
+                grid = make_grid(grid, nrow=n_rows)
 
-                    # to image
-                    grid = 255. * rearrange(grid, 'c h w -> h w c').cpu().numpy()
-                    img = Image.fromarray(grid.astype(np.uint8))
-                    img = put_watermark(img, wm_encoder)
-                    img.save(os.path.join(outdir, f'grid-{grid_count:04}.png'))
-                    grid_count += 1
+                # to image
+                grid = 255. * rearrange(grid, 'c h w -> h w c').cpu().numpy()
+                img = Image.fromarray(grid.astype(np.uint8))
+                img = put_watermark(img, wm_encoder)
+                img.save(os.path.join(outdir, f'grid-{grid_count:04}.png'))
+                grid_count += 1
 
     print(f"Your samples are ready and waiting for you here: \n{outdir} \n"
           f" \nEnjoy.")
