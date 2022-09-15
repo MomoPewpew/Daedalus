@@ -88,11 +88,6 @@ def main():
         help="do not save a grid, only individual samples. Helpful when evaluating lots of samples",
     )
     parser.add_argument(
-        "--skip_save",
-        action='store_true',
-        help="do not save individual samples. For speed measurements.",
-    )
-    parser.add_argument(
         "--ddim_steps",
         type=int,
         default=50,
@@ -233,14 +228,6 @@ def main():
                         x_samples_ddim = x_samples_ddim.cpu().permute(0, 2, 3, 1).numpy()
 
                         x_checked_image_torch = torch.from_numpy(x_samples_ddim).permute(0, 3, 1, 2)
-
-                        if not opt.skip_save:
-                            for x_sample in x_checked_image_torch:
-                                x_sample = 255. * rearrange(x_sample.cpu().numpy(), 'c h w -> h w c')
-                                img = Image.fromarray(x_sample.astype(np.uint8))
-                                img = put_watermark(img, wm_encoder)
-                                img.save(os.path.join(outdir, f"{base_count:05}.png"))
-                                base_count += 1
 
                         if not opt.skip_grid:
                             all_samples.append(x_checked_image_torch)
