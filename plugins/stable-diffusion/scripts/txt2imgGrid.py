@@ -115,12 +115,6 @@ def main():
         help="ddim eta (eta=0.0 corresponds to deterministic sampling",
     )
     parser.add_argument(
-        "--n_iter",
-        type=int,
-        default=2,
-        help="sample this often",
-    )
-    parser.add_argument(
         "--H",
         type=int,
         default=512,
@@ -227,7 +221,7 @@ def main():
         with precision_scope("cuda"):
             with model.ema_scope():
                 all_samples = list()
-                for n in trange(opt.n_iter, desc="Sampling"):
+                for n in trange(2, desc="Sampling"):
                     for prompts in tqdm(data, desc="data"):
                         uc = None
                         if opt.scale != 1.0:

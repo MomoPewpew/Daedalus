@@ -197,7 +197,6 @@ def main():
     with torch.no_grad():
         with precision_scope("cuda"):
             with model.ema_scope():
-                all_samples = list()
                 for prompts in tqdm(data, desc="data"):
                     uc = None
                     if opt.scale != 1.0:
