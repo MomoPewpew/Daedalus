@@ -133,12 +133,6 @@ def main():
         help="downsampling factor",
     )
     parser.add_argument(
-        "--n_samples",
-        type=int,
-        default=3,
-        help="how many samples to produce for each given prompt. A.k.a. batch size",
-    )
-    parser.add_argument(
         "--n_rows",
         type=int,
         default=0,
@@ -202,7 +196,7 @@ def main():
     wm_encoder = WatermarkEncoder()
     wm_encoder.set_watermark('bytes', wm.encode('utf-8'))
 
-    batch_size = opt.n_samples
+    batch_size = 3
     n_rows = opt.n_rows if opt.n_rows > 0 else batch_size
 
     prompt = opt.prompt
@@ -214,7 +208,7 @@ def main():
 
     start_code = None
     if opt.fixed_code:
-        start_code = torch.randn([opt.n_samples, 4, opt.H // opt.f, opt.W // opt.f], device=device)
+        start_code = torch.randn([batch_size, 4, opt.H // opt.f, opt.W // opt.f], device=device)
 
     precision_scope = autocast if opt.precision=="autocast" else nullcontext
     with torch.no_grad():
@@ -232,7 +226,7 @@ def main():
                         shape = [4, opt.H // opt.f, opt.W // opt.f]
                         samples_ddim, _ = sampler.sample(S=opt.ddim_steps,
                                                          conditioning=c,
-                                                         batch_size=opt.n_samples,
+                                                         batch_size=batch_size,
                                                          shape=shape,
                                                          verbose=False,
                                                          unconditional_guidance_scale=opt.scale,
