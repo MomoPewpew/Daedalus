@@ -27,28 +27,39 @@ def main() -> None:
 
     if opt.function == "":
         return
+    
+    opt.args = opt.args.replace("#arg#", "--").replace("#colon#", "\"")
 
     os.system("sudo shutdown -P +10")
 
     os.system("rm /home/ubuntu/Daedalus/in/*")
     os.system("rm /home/ubuntu/Daedalus/out/*")
 
-    eval(opt.function + '(opt)')
+    cmd = eval(opt.function + '(opt)')
 
-    ##TODO: Start shutdown countdown?
+    if cmd != "":
+        os.system(cmd)
 
-def arcanegan(opt: argparse.Namespace) -> None:
-    if opt.sourceURL == "":
-        return
-    
-    os.system(f"wget -P /home/ubuntu/Daedalus/in {opt.sourceURL}")
-
-    cmd = 'conda run -n arcanegan python3 /home/ubuntu/Daedalus/plugins/ArcaneGAN/arcanegan.py'
-    handlecmd(cmd)
-
-def handlecmd(cmd: str) -> None:
-    os.system(cmd)
     os.system("sudo shutdown -P +1")
+
+def download(sourceURL: str) -> bool:
+    if sourceURL == "":
+        return False
+
+    os.system(f"wget -P /home/ubuntu/Daedalus/in {sourceURL}")
+    return True
+
+def arcanegan(opt: argparse.Namespace) -> str:
+    if download(opt.sourceURL):
+        return 'conda run -n arcanegan python3 /home/ubuntu/Daedalus/plugins/ArcaneGAN/arcanegan.py'
+    else:
+        return ""
+
+def txt2imgSingle(opt: argparse.Namespace) -> str:
+    return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/txt2imgSingleSample.py {opt.args}"
+
+def txt2imgGrid(opt: argparse.Namespace) -> str:
+    return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/txt2imgGrid.py {opt.args}"
 
 if __name__ == "__main__":
     main()
