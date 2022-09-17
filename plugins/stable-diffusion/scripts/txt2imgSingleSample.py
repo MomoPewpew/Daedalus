@@ -92,11 +92,6 @@ def main():
         help="use plms sampling",
     )
     parser.add_argument(
-        "--fixed_code",
-        action='store_true',
-        help="if enabled, uses the same starting code across samples ",
-    )
-    parser.add_argument(
         "--ddim_eta",
         type=float,
         default=0.0,
@@ -113,12 +108,6 @@ def main():
         type=int,
         default=512,
         help="image width, in pixel space",
-    )
-    parser.add_argument(
-        "--f",
-        type=int,
-        default=8,
-        help="downsampling factor",
     )
     parser.add_argument(
         "--scale",
@@ -185,8 +174,6 @@ def main():
     base_count = len(os.listdir(outdir))
 
     start_code = None
-    if opt.fixed_code:
-        start_code = torch.randn([1, 4, opt.H // opt.f, opt.W // opt.f], device=device)
 
     precision_scope = autocast if opt.precision=="autocast" else nullcontext
     with torch.no_grad():
@@ -199,7 +186,7 @@ def main():
                     if isinstance(prompts, tuple):
                         prompts = list(prompts)
                     c = model.get_learned_conditioning(prompts)
-                    shape = [4, opt.H // opt.f, opt.W // opt.f]
+                    shape = [4, opt.H // 8, opt.W // 8]
                     samples_ddim, _ = sampler.sample(S=opt.ddim_steps,
                                                         conditioning=c,
                                                         batch_size=1,

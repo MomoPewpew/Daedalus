@@ -28,7 +28,7 @@ def main() -> None:
     if opt.function == "":
         return
     
-    opt.args = opt.args.replace("#arg#", "--").replace("#colon#", "\"")
+    opt.args = opt.args.replace("#arg#", "--").replace("#qt#", "\"")
 
     os.system("sudo shutdown -P +10")
 
