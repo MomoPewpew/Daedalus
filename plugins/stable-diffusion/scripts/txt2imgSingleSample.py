@@ -205,8 +205,8 @@ def main():
                         x_sample = 255. * rearrange(x_sample.cpu().numpy(), 'c h w -> h w c')
                         img = Image.fromarray(x_sample.astype(np.uint8))
                         img = put_watermark(img, wm_encoder)
-                        filename = opt.prompt[:min(len(opt.prompt)- 1, 50)].replace(" ", "_")
-                        img.save(os.path.join(outdir, f"{filename}-{opt.seed}.png.png"))
+                        filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_")
+                        img.save(os.path.join(outdir, f"{filename}-{opt.seed}png"))
 
     print(f"Your samples are ready and waiting for you here: \n{outdir} \n"
           f" \nEnjoy.")
