@@ -228,7 +228,7 @@ def main():
                 grid = 255. * rearrange(grid, 'c h w -> h w c').cpu().numpy()
                 img = Image.fromarray(grid.astype(np.uint8))
                 img = put_watermark(img, wm_encoder)
-                filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_")
+                filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_")
                 img.save(os.path.join(outdir, f'grid-{filename}-{opt.seed}.png'))
 
     print(f"Your samples are ready and waiting for you here: \n{outdir} \n"
