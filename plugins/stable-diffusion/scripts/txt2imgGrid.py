@@ -1,4 +1,4 @@
-import argparse, os, sys, glob
+import argparse, os
 import cv2
 import torch
 import numpy as np
@@ -9,24 +9,13 @@ from imwatermark import WatermarkEncoder
 from itertools import islice
 from einops import rearrange
 from torchvision.utils import make_grid
-import time
 from pytorch_lightning import seed_everything
 from torch import autocast
-from contextlib import contextmanager, nullcontext
+from contextlib import nullcontext
 
 from ldm.util import instantiate_from_config
 from ldm.models.diffusion.ddim import DDIMSampler
 from ldm.models.diffusion.plms import PLMSSampler
-
-from diffusers.pipelines.stable_diffusion.safety_checker import StableDiffusionSafetyChecker
-from transformers import AutoFeatureExtractor
-
-
-# load safety model
-safety_model_id = "CompVis/stable-diffusion-safety-checker"
-safety_feature_extractor = AutoFeatureExtractor.from_pretrained(safety_model_id)
-safety_checker = StableDiffusionSafetyChecker.from_pretrained(safety_model_id)
-
 
 def chunk(it, size):
     it = iter(it)
@@ -172,9 +161,6 @@ def main():
     n_rows = 3
     ddim_steps = 15
 
-    opt.H = opt.H // 2 if opt.H != 64 else 64
-    opt.W = opt.W // 2 if opt.W != 64 else 64
-
     prompt = opt.prompt
     assert prompt is not None
     data = [batch_size * [prompt]]
@@ -228,8 +214,9 @@ def main():
                 grid = 255. * rearrange(grid, 'c h w -> h w c').cpu().numpy()
                 img = Image.fromarray(grid.astype(np.uint8))
                 img = put_watermark(img, wm_encoder)
+                img = img.resize((opt.W, opt.H), Image.ANTIALIAS)
                 filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_")
-                img.save(os.path.join(outdir, f'grid-{filename}-{opt.seed}.png'))
+                img.save(os.path.join(outdir, f'grid-{filename}-{opt.seed - 9}.png'))
 
     print(f"Your samples are ready and waiting for you here: \n{outdir} \n"
           f" \nEnjoy.")
