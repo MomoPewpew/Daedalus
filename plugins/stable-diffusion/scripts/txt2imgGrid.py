@@ -131,13 +131,13 @@ def main():
     parser.add_argument(
         "--config",
         type=str,
-        default="configs/stable-diffusion/v1-inference.yaml",
+        default="/home/ubuntu/Daedalus/plugins/stable-diffusion/configs/stable-diffusion/v1-inference.yaml",
         help="path to config which constructs model",
     )
     parser.add_argument(
         "--ckpt",
         type=str,
-        default="models/ldm/stable-diffusion-v1/sd-v1-4.ckpt",
+        default="/home/ubuntu/Daedalus/plugins/stable-diffusion/models/ldm/stable-diffusion-v1/sd-v1-4.ckpt",
         help="path to checkpoint of model",
     )
     parser.add_argument(
@@ -180,14 +180,16 @@ def main():
     wm_encoder = WatermarkEncoder()
     wm_encoder.set_watermark('bytes', wm.encode('utf-8'))
 
-    batch_size = 3
-    n_rows = batch_size
+    batch_size = 1
+    n_rows = 3
+
+    opt.H = opt.H // 2 if opt.H != 64 else 64
+    opt.W = opt.W // 2 if opt.W != 64 else 64
 
     prompt = opt.prompt
     assert prompt is not None
     data = [batch_size * [prompt]]
 
-    base_count = len(os.listdir(outdir))
     grid_count = len(os.listdir(outdir)) - 1
 
     start_code = None
@@ -199,7 +201,9 @@ def main():
         with precision_scope("cuda"):
             with model.ema_scope():
                 all_samples = list()
-                for n in trange(2, desc="Sampling"):
+                for n in trange(9, desc="Sampling"):
+                    seed_everything(opt.seed)
+
                     for prompts in tqdm(data, desc="data"):
                         uc = None
                         if opt.scale != 1.0:
@@ -225,6 +229,8 @@ def main():
                         x_checked_image_torch = torch.from_numpy(x_samples_ddim).permute(0, 3, 1, 2)
 
                         all_samples.append(x_checked_image_torch)
+
+                    opt.seed += 1
 
                 # additionally, save as grid
                 grid = torch.stack(all_samples, 0)
