@@ -216,7 +216,7 @@ def main():
                 img = put_watermark(img, wm_encoder)
                 img = img.resize((opt.W, opt.H), Image.ANTIALIAS)
                 filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_")
-                img.save(os.path.join(outdir, f'grid-{filename}-{opt.seed - 9}.png'))
+                img.save(os.path.join(outdir, f'batch-{filename}-{opt.seed - 9}.png'))
 
     print(f"Your samples are ready and waiting for you here: \n{outdir} \n"
           f" \nEnjoy.")
