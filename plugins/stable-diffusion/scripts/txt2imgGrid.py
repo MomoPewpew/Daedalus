@@ -83,12 +83,6 @@ def main():
         help="the prompt to render"
     )
     parser.add_argument(
-        "--ddim_steps",
-        type=int,
-        default=50,
-        help="number of ddim sampling steps",
-    )
-    parser.add_argument(
         "--plms",
         action='store_true',
         help="use plms sampling",
@@ -115,12 +109,6 @@ def main():
         type=int,
         default=512,
         help="image width, in pixel space",
-    )
-    parser.add_argument(
-        "--f",
-        type=int,
-        default=8,
-        help="downsampling factor",
     )
     parser.add_argument(
         "--scale",
@@ -182,6 +170,7 @@ def main():
 
     batch_size = 1
     n_rows = 3
+    ddim_steps = 15
 
     opt.H = opt.H // 2 if opt.H != 64 else 64
     opt.W = opt.W // 2 if opt.W != 64 else 64
@@ -194,7 +183,7 @@ def main():
 
     start_code = None
     if opt.fixed_code:
-        start_code = torch.randn([batch_size, 4, opt.H // opt.f, opt.W // opt.f], device=device)
+        start_code = torch.randn([batch_size, 4, opt.H // 8, opt.W // 8], device=device)
 
     precision_scope = autocast if opt.precision=="autocast" else nullcontext
     with torch.no_grad():
@@ -211,8 +200,8 @@ def main():
                         if isinstance(prompts, tuple):
                             prompts = list(prompts)
                         c = model.get_learned_conditioning(prompts)
-                        shape = [4, opt.H // opt.f, opt.W // opt.f]
-                        samples_ddim, _ = sampler.sample(S=opt.ddim_steps,
+                        shape = [4, opt.H // 8, opt.W // 8]
+                        samples_ddim, _ = sampler.sample(S=ddim_steps,
                                                          conditioning=c,
                                                          batch_size=batch_size,
                                                          shape=shape,
