@@ -130,11 +130,6 @@ def main():
         help="strength for noising/unnoising. 1.0 corresponds to full destruction of information in init image",
     )
     parser.add_argument(
-        "--from-file",
-        type=str,
-        help="if specified, load prompts from this file",
-    )
-    parser.add_argument(
         "--config",
         type=str,
         default="/home/ubuntu/Daedalus/plugins/stable-diffusion/configs/stable-diffusion/v1-inference.yaml",
@@ -184,16 +179,10 @@ def main():
 
     batch_size = opt.n_samples
     n_rows = opt.n_rows if opt.n_rows > 0 else batch_size
-    if not opt.from_file:
-        prompt = opt.prompt
-        assert prompt is not None
-        data = [batch_size * [prompt]]
 
-    else:
-        print(f"reading prompts from {opt.from_file}")
-        with open(opt.from_file, "r") as f:
-            data = f.read().splitlines()
-            data = list(chunk(data, batch_size))
+    prompt = opt.prompt
+    assert prompt is not None
+    data = [batch_size * [prompt]]
 
     sample_path = os.path.join(outpath, "samples")
     os.makedirs(sample_path, exist_ok=True)
