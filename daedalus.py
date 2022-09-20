@@ -64,5 +64,8 @@ def txt2imgGrid(opt: argparse.Namespace) -> str:
 def txt2imgVariations(opt: argparse.Namespace) -> str:
     return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/txt2imgVariations.py {opt.args}"
 
+def img2imgSingle(opt: argparse.Namespace) -> str:
+    return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/txt2imgSingleSample.py {opt.args}"
+
 if __name__ == "__main__":
     main()
