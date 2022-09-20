@@ -91,18 +91,6 @@ def main():
         help="ddim eta (eta=0.0 corresponds to deterministic sampling",
     )
     parser.add_argument(
-        "--n_samples",
-        type=int,
-        default=2,
-        help="how many samples to produce for each given prompt. A.k.a batch size",
-    )
-    parser.add_argument(
-        "--n_rows",
-        type=int,
-        default=0,
-        help="rows in the grid (default: n_samples)",
-    )
-    parser.add_argument(
         "--scale",
         type=float,
         default=5.0,
@@ -162,8 +150,7 @@ def main():
     outpath = os.path.join('/home/ubuntu/Daedalus/out')
     os.makedirs(outpath, exist_ok=True)
 
-    batch_size = opt.n_samples
-    n_rows = opt.n_rows if opt.n_rows > 0 else batch_size
+    batch_size = 1
 
     prompt = opt.prompt
     assert prompt is not None
