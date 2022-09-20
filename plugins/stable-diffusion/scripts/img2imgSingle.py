@@ -221,8 +221,8 @@ def main():
                         if not opt.skip_save:
                             for x_sample in x_samples:
                                 x_sample = 255. * rearrange(x_sample.cpu().numpy(), 'c h w -> h w c')
+                                filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_")
                                 Image.fromarray(x_sample.astype(np.uint8)).save(
-                                    filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_")
                                     os.path.join(outpath, f"{filename}-{opt.seed}.png"))
                         all_samples.append(x_samples)
 
