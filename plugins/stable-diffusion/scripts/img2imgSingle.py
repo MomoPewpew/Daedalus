@@ -51,7 +51,7 @@ def load_img(path):
     print(f"loaded input image of size ({w}, {h}) from {path}")
     w, h = map(lambda x: x - x % 32, (w, h))  # resize to integer multiple of 32
     image = image.resize((w, h), resample=PIL.Image.LANCZOS)
-    image = np.array(image).astype(np.float32) / 255.0
+    image = np.array(image).astype(np.float16) / 255.0
     image = image[None].transpose(0, 3, 1, 2)
     image = torch.from_numpy(image)
     return 2.*image - 1.
@@ -66,12 +66,6 @@ def main():
         nargs="?",
         default="a painting of a virus monster playing guitar",
         help="the prompt to render"
-    )
-    parser.add_argument(
-        "--init-img",
-        type=str,
-        nargs="?",
-        help="path to the input image"
     )
     parser.add_argument(
         "--ddim_steps",
@@ -132,6 +126,7 @@ def main():
     seed_everything(opt.seed)
 
     # needed when model is in half mode, remove if not using half mode
+    # if this line is removed, set np.float16 to np.float32
     torch.set_default_tensor_type(torch.HalfTensor)
     
     config = OmegaConf.load(f"{opt.config}")
@@ -156,8 +151,10 @@ def main():
     assert prompt is not None
     data = [batch_size * [prompt]]
 
-    assert os.path.isfile(opt.init_img)
-    init_image = load_img(opt.init_img).to(device)
+    filenames = glob.glob("/home/ubuntu/Daedalus/in/*")
+
+    assert os.path.isfile(filenames[0])
+    init_image = load_img(filenames[0]).to(device)
     init_image = repeat(init_image, '1 ... -> b ...', b=batch_size)
     init_latent = model.get_first_stage_encoding(model.encode_first_stage(init_image))  # move to latent space
 
