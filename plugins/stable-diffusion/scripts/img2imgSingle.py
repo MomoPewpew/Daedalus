@@ -74,13 +74,6 @@ def main():
         help="path to the input image"
     )
     parser.add_argument(
-        "--outdir",
-        type=str,
-        nargs="?",
-        help="dir to write results to",
-        default="outputs/img2img-samples"
-    )
-    parser.add_argument(
         "--skip_grid",
         action='store_true',
         help="do not save a grid, only individual samples. Helpful when evaluating lots of samples",
@@ -204,8 +197,8 @@ def main():
     else:
         sampler = DDIMSampler(model)
 
-    os.makedirs(opt.outdir, exist_ok=True)
-    outpath = opt.outdir
+    outpath = os.path.join('/home/ubuntu/Daedalus/out')
+    os.makedirs(outpath, exist_ok=True)
 
     batch_size = opt.n_samples
     n_rows = opt.n_rows if opt.n_rows > 0 else batch_size
