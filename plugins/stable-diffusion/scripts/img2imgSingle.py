@@ -106,12 +106,6 @@ def main():
         help="ddim eta (eta=0.0 corresponds to deterministic sampling",
     )
     parser.add_argument(
-        "--f",
-        type=int,
-        default=8,
-        help="downsampling factor, most often 8 or 16",
-    )
-    parser.add_argument(
         "--n_samples",
         type=int,
         default=2,
