@@ -68,22 +68,6 @@ def main():
         help="the prompt to render"
     )
     parser.add_argument(
-        "--skip_grid",
-        action='store_true',
-        help="do not save a grid, only individual samples. Helpful when evaluating lots of samples",
-    )
-    parser.add_argument(
-        "--skip_save",
-        action='store_true',
-        help="do not save indiviual samples. For speed measurements.",
-    )
-    parser.add_argument(
-        "--ddim_steps",
-        type=int,
-        default=50,
-        help="number of ddim sampling steps",
-    )
-    parser.add_argument(
         "--plms",
         action='store_true',
         help="use plms sampling",
@@ -98,18 +82,6 @@ def main():
         type=float,
         default=0.0,
         help="ddim eta (eta=0.0 corresponds to deterministic sampling",
-    )
-    parser.add_argument(
-        "--n_samples",
-        type=int,
-        default=2,
-        help="how many samples to produce for each given prompt. A.k.a batch size",
-    )
-    parser.add_argument(
-        "--n_rows",
-        type=int,
-        default=0,
-        help="rows in the grid (default: n_samples)",
     )
     parser.add_argument(
         "--scale",
@@ -172,8 +144,9 @@ def main():
     outpath = os.path.join('/home/ubuntu/Daedalus/out')
     os.makedirs(outpath, exist_ok=True)
 
-    batch_size = opt.n_samples
-    n_rows = opt.n_rows if opt.n_rows > 0 else batch_size
+    batch_size = 1
+    n_rows = 3
+    ddim_steps = 15
 
     prompt = opt.prompt
     assert prompt is not None
@@ -186,10 +159,10 @@ def main():
     init_image = repeat(init_image, '1 ... -> b ...', b=batch_size)
     init_latent = model.get_first_stage_encoding(model.encode_first_stage(init_image))  # move to latent space
 
-    sampler.make_schedule(ddim_num_steps=opt.ddim_steps, ddim_eta=opt.ddim_eta, verbose=False)
+    sampler.make_schedule(ddim_num_steps=ddim_steps, ddim_eta=opt.ddim_eta, verbose=False)
 
     assert 0. <= opt.strength <= 1., 'can only work with strength in [0.0, 1.0]'
-    t_enc = int(opt.strength * opt.ddim_steps)
+    t_enc = int(opt.strength * ddim_steps)
     print(f"target t_enc is {t_enc} steps")
 
     precision_scope = autocast if opt.precision == "autocast" else nullcontext
@@ -197,7 +170,8 @@ def main():
         with precision_scope("cuda"):
             with model.ema_scope():
                 all_samples = list()
-                for n in trange(1, desc="Sampling"):
+                for n in trange(9, desc="Sampling"):
+                    seed_everything(opt.seed)
                     for prompts in tqdm(data, desc="data"):
                         uc = None
                         if opt.scale != 1.0:
@@ -215,24 +189,17 @@ def main():
                         x_samples = model.decode_first_stage(samples)
                         x_samples = torch.clamp((x_samples + 1.0) / 2.0, min=0.0, max=1.0)
 
-                        if not opt.skip_save:
-                            for x_sample in x_samples:
-                                x_sample = 255. * rearrange(x_sample.cpu().numpy(), 'c h w -> h w c')
-                                filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_")
-                                Image.fromarray(x_sample.astype(np.uint8)).save(
-                                    os.path.join(outpath, f"{filename}-{opt.seed}.png"))
                         all_samples.append(x_samples)
+                    opt.seed += 1
 
-                if not opt.skip_grid:
-                    # additionally, save as grid
-                    grid = torch.stack(all_samples, 0)
-                    grid = rearrange(grid, 'n b c h w -> (n b) c h w')
-                    grid = make_grid(grid, nrow=n_rows)
+                grid = torch.stack(all_samples, 0)
+                grid = rearrange(grid, 'n b c h w -> (n b) c h w')
+                grid = make_grid(grid, nrow=n_rows)
 
-                    # to image
-                    grid = 255. * rearrange(grid, 'c h w -> h w c').cpu().numpy()
-                    filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_")
-                    Image.fromarray(grid.astype(np.uint8)).save(os.path.join(outpath, f'grid-{filename}-{opt.seed}.png'))
+                # to image
+                grid = 255. * rearrange(grid, 'c h w -> h w c').cpu().numpy()
+                filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_")
+                Image.fromarray(grid.astype(np.uint8)).save(os.path.join(outpath, f'grid-{filename}-{opt.seed - 9}.png'))
 
     print(f"Your samples are ready and waiting for you here: \n{outpath} \n"
           f" \nEnjoy.")
