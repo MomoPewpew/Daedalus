@@ -56,10 +56,10 @@ def arcanegan(opt: argparse.Namespace) -> str:
         return ""
 
 def txt2imgSingle(opt: argparse.Namespace) -> str:
-    return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/txt2imgSingleSample.py {opt.args}"
+    return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/txt2imgSingle.py {opt.args}"
 
-def txt2imgGrid(opt: argparse.Namespace) -> str:
-    return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/txt2imgGrid.py {opt.args}"
+def txt2imgBatch(opt: argparse.Namespace) -> str:
+    return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/txt2imgBatch.py {opt.args}"
 
 def txt2imgVariations(opt: argparse.Namespace) -> str:
     return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/txt2imgVariations.py {opt.args}"
@@ -67,6 +67,18 @@ def txt2imgVariations(opt: argparse.Namespace) -> str:
 def img2imgSingle(opt: argparse.Namespace) -> str:
     if download(opt.sourceURL):
         return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/img2imgSingle.py {opt.args}"
+    else:
+        return ""
+
+def img2imgBatch(opt: argparse.Namespace) -> str:
+    if download(opt.sourceURL):
+        return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/img2imgBatch.py {opt.args}"
+    else:
+        return ""
+
+def img2imgVariations(opt: argparse.Namespace) -> str:
+    if download(opt.sourceURL):
+        return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/img2imgVariations.py {opt.args}"
     else:
         return ""
 
