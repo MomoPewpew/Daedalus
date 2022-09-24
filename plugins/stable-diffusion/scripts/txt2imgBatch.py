@@ -175,8 +175,7 @@ def main():
             with model.ema_scope():
                 all_samples = list()
                 for n in trange(9, desc="Sampling"):
-                    seed_everything(opt.seed)
-
+                    seed_everything(opt.seed + n)
                     for prompts in tqdm(data, desc="data"):
                         uc = None
                         if opt.scale != 1.0:
@@ -203,8 +202,6 @@ def main():
 
                         all_samples.append(x_checked_image_torch)
 
-                    opt.seed += 1
-
                 # additionally, save as grid
                 grid = torch.stack(all_samples, 0)
                 grid = rearrange(grid, 'n b c h w -> (n b) c h w')
@@ -216,7 +213,7 @@ def main():
                 img = put_watermark(img, wm_encoder)
                 img = img.resize((opt.W, opt.H), Image.ANTIALIAS)
                 filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_")
-                img.save(os.path.join(outdir, f'batch-{filename}-{opt.seed - 9}.png'))
+                img.save(os.path.join(outdir, f'batch-{filename}-{opt.seed}.png'))
 
     print(f"Your samples are ready and waiting for you here: \n{outdir} \n"
           f" \nEnjoy.")

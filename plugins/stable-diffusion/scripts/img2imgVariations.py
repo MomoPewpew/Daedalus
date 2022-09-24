@@ -55,7 +55,7 @@ def load_img(path):
     image = np.array(image).astype(np.float16) / 255.0
     image = image[None].transpose(0, 3, 1, 2)
     image = torch.from_numpy(image)
-    return 2.*image - 1.
+    return 2.*image - 1., w, h
 
 
 def main():
@@ -149,7 +149,8 @@ def main():
     filenames = glob.glob("/home/ubuntu/Daedalus/in/*")
 
     assert os.path.isfile(filenames[0])
-    init_image = load_img(filenames[0]).to(device)
+    init_image_raw, W, H = load_img(filenames[0])
+    init_image = init_image_raw.to(device)
     init_image = repeat(init_image, '1 ... -> b ...', b=batch_size)
     init_latent = model.get_first_stage_encoding(model.encode_first_stage(init_image))  # move to latent space
 
@@ -165,14 +166,15 @@ def main():
             with model.ema_scope():
                 all_samples = list()
                 for n in trange(9, desc="Sampling"):
-                    row = math.floor(n / n_rows)
-                    column = (n %n_rows)
+                    row = math.floor((n) / n_rows)
+                    column = ((n) %n_rows)
 
                     scale = scales[column]
                     strength = strengths[row]
                     
                     assert 0. <= strength <= 1., 'can only work with strength in [0.0, 1.0]'
                     t_enc = int(strength * ddim_steps)
+                    seed_everything(opt.seed)
                     for prompts in tqdm(data, desc="data"):
                         uc = None
                         if scale != 1.0:
@@ -198,8 +200,10 @@ def main():
 
                 # to image
                 grid = 255. * rearrange(grid, 'c h w -> h w c').cpu().numpy()
+                img = Image.fromarray(grid.astype(np.uint8))
+                img = img.resize((W, H), Image.ANTIALIAS)
                 filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_")
-                Image.fromarray(grid.astype(np.uint8)).save(os.path.join(outpath, f'variations-{filename}-{opt.seed - 9}.png'))
+                img.save(os.path.join(outpath, f'variations-{filename}-{opt.seed}.png'))
 
     print(f"Your samples are ready and waiting for you here: \n{outpath} \n"
           f" \nEnjoy.")
