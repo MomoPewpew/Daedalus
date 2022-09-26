@@ -167,7 +167,7 @@ def process(upload=True):
     backslash_char = "/"
     out = f"{out_dir}/{img.split(backslash_char)[-1].split('.')[0]}.jpg"
     im = PIL.Image.open(img).convert("RGB") 
-    im = scale_by_face_size(im, target_face=300, max_res=1_500_000, max_upscale=2)
+    #im = scale_by_face_size(im, target_face=300, max_res=1_500_000, max_upscale=1)
     res = proc_pil_img(im, model)
     res.save(out)
 
