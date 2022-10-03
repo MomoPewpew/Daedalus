@@ -25,8 +25,15 @@ from bilateral_filtering import sparse_bilateral_filtering
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--config', type=str, default='argument.yml',help='Configure of post processing')
+parser.add_argument('--fps', type=int, default=40, help='Frames per second')
+parser.add_argument('--num_frames', type=int, default=240, help='Total frame count')
+
 args = parser.parse_args()
 config = yaml.load(open(args.config, 'r'))
+
+config['fps'] = args.fps
+config['num_frames'] = args.num_frames
+
 if config['offscreen_rendering'] is True:
     vispy.use(app='egl')
 os.makedirs(config['mesh_folder'], exist_ok=True)
