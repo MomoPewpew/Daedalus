@@ -1,5 +1,7 @@
 import argparse
+import glob
 import os
+from PIL import Image
 
 def main() -> None:
     parser = argparse.ArgumentParser()
@@ -49,11 +51,25 @@ def download(sourceURL: str) -> bool:
     os.system(f"wget -P /home/ubuntu/Daedalus/in {sourceURL}")
     return True
 
+def convertInToJPG() -> None:
+    filenames = glob.glob("/home/ubuntu/Daedalus/in/*")
+
+    assert os.path.isfile(filenames[0])
+
+    if ".jpg" in filenames[0]: return
+
+    path, name = os.path.split(filenames[0])
+    index = name.find(".")
+    baseName = name[:index]
+
+    Image.open(filenames[0]).convert("RGB").save(f'{path}/{baseName}.jpg')
+    os.system(f"rm {filenames[0]}")
+
 def arcanegan(opt: argparse.Namespace) -> str:
     if download(opt.sourceURL):
         return 'conda run -n arcanegan python3 /home/ubuntu/Daedalus/plugins/ArcaneGAN/arcanegan.py'
-    else:
-        return ""
+
+    return ""
 
 def txt2imgSingle(opt: argparse.Namespace) -> str:
     return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/txt2imgSingle.py {opt.args}"
@@ -67,26 +83,34 @@ def txt2imgVariations(opt: argparse.Namespace) -> str:
 def img2imgSingle(opt: argparse.Namespace) -> str:
     if download(opt.sourceURL):
         return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/img2imgSingle.py {opt.args}"
-    else:
-        return ""
+
+    return ""
 
 def img2imgBatch(opt: argparse.Namespace) -> str:
     if download(opt.sourceURL):
         return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/img2imgBatch.py {opt.args}"
-    else:
-        return ""
+
+    return ""
 
 def img2imgVariations(opt: argparse.Namespace) -> str:
     if download(opt.sourceURL):
         return f"conda run -n stablediffusion python3 /home/ubuntu/Daedalus/plugins/stable-diffusion/scripts/img2imgVariations.py {opt.args}"
-    else:
-        return ""
+
+    return ""
 
 def realesrgangan(opt: argparse.Namespace) -> str:
     if download(opt.sourceURL):
         return 'conda run -n realesrgan python3 /home/ubuntu/Daedalus/plugins/Real-ESRGAN/upscale_image.py'
-    else:
-        return ""
+
+    return ""
+
+def ThreeDInPaint(opt: argparse.Namespace) -> str:
+    if download(opt.sourceURL):
+        convertInToJPG()
+        os.system("sudo shutdown -P +20")
+        return f'conda run -n 3DP python3 /home/ubuntu/Daedalus/plugins/3d-photo-inpainting/main.py {opt.args}'
+
+    return ""
 
 if __name__ == "__main__":
     main()
