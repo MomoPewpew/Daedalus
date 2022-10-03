@@ -5,7 +5,7 @@ import numpy as np
 import imageio
 from MiDaS.MiDaS_utils import write_depth
 
-BOOST_BASE = 'BoostingMonocularDepth'
+BOOST_BASE = '/home/ubuntu/Daedalus/plugins/3d-photo-inpainting/BoostingMonocularDepth'
 
 BOOST_INPUTS = 'inputs'
 BOOST_OUTPUTS = 'outputs'
