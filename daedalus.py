@@ -98,9 +98,15 @@ def img2imgVariations(opt: argparse.Namespace) -> str:
 
     return ""
 
-def realesrgangan(opt: argparse.Namespace) -> str:
+def realesrgan(opt: argparse.Namespace) -> str:
     if download(opt.sourceURL):
         return 'conda run -n realesrgan python3 /home/ubuntu/Daedalus/plugins/Real-ESRGAN/upscale_image.py'
+
+    return ""
+
+def gfpgan(opt: argparse.Namespace) -> str:
+    if download(opt.sourceURL):
+        return 'conda run -n realesrgan python3 /home/ubuntu/Daedalus/plugins/Real-ESRGAN/upscale_image.py --face_enhance'
 
     return ""
 
