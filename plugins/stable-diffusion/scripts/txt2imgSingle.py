@@ -195,7 +195,7 @@ def main():
                         x_sample = 255. * rearrange(x_sample.cpu().numpy(), 'c h w -> h w c')
                         img = Image.fromarray(x_sample.astype(np.uint8))
                         img = put_watermark(img, wm_encoder)
-                        filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_")
+                        filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_").replace(",", "_").replace(".", "_").replace("$", "_").replace("&", "_").replace("+", "_").replace(";", "_").replace("=", "_").replace("@", "_")
                         while "__" in filename: filename = filename.replace("__", "_")
                         img.save(os.path.join(outdir, f"{filename}-{opt.seed}.png"))
 

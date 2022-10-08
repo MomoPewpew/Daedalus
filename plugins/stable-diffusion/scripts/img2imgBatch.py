@@ -200,7 +200,7 @@ def main():
                 grid = 255. * rearrange(grid, 'c h w -> h w c').cpu().numpy()
                 img = Image.fromarray(grid.astype(np.uint8))
                 img = img.resize((W, H), Image.ANTIALIAS)
-                filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_")
+                filename = opt.prompt[:min(len(opt.prompt), 50)].replace(" ", "_").replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_").replace(",", "_").replace(".", "_").replace("$", "_").replace("&", "_").replace("+", "_").replace(";", "_").replace("=", "_").replace("@", "_")
                 while "__" in filename: filename = filename.replace("__", "_")
                 img.save(os.path.join(outpath, f'batch-{filename}-{opt.seed}.png'))
 
